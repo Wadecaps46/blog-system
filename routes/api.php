@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Api\categoryController;
 use App\Http\Controllers\Api\AuthController;
 use App\Models\User;
+use App\Models\Post;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -14,7 +15,31 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/register', [AuthController::class, 'register']);
 
+Route::middleware(['auth:sanctum', 'ability:create-post'])->post('/posts', function (Request $request) {
+    // Validar los datos del post
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'content' => 'required|string',
+        'category_id' => 'required|exists:categories,id',
+    ]);
 
+    // Crear el post y asociarlo al usuario autenticado
+    $post = Post::create([
+        'title' => $validated['title'],
+        'content' => $validated['content'],
+        'category_id' => $validated['category_id'],
+        'user_id' => $request->user()->id, // Asigna el post al usuario autenticado
+    ]);
+
+    return response()->json([
+        'message' => 'Post creado exitosamente',
+        'post' => $post
+    ], 201);
+});
+
+
+
+// Creacion de rutas con permisos de post para test
 Route::middleware(['auth:sanctum', 'ability:create-post'])->get('/post/create', function (Request $request) {
     return [
         'id' => $request->id,
