@@ -4,13 +4,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Api\categoryController;
+use App\Http\Controllers\Api\AuthController;
 use App\Models\User;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::middleware(['auth:sanctum', 'ability:create-post'])->get('/post/create', function (Request $request) {
+
+Route::post('/register', [AuthController::class, 'register']);
+
+
+Route::middleware(['auth:sanctum', 'ability:create-post'])->get('/posts/create', function (Request $request) {
     return [
         'id' => $request->id,
         'title' => $request->title,
