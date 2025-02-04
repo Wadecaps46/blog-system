@@ -2,16 +2,26 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Api\categoryController;
+use App\Models\User;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+Route::middleware(['auth:sanctum', 'ability:create-post'])->get('/post/create', function (Request $request) {
+    return [
+        'id' => $request->id,
+        'title' => $request->title,
+        'content' => $request->content,
+    ];
+});
+
 Route::post('/login', function (Request $request) {
     $user = User::where('email', $request->input('email'))->first();
 
-    if (!$user || !Hash::check($request->password) != $user->password) {
+    if (!$user || !Hash::check($request->password, $user->password)) {
         return response()->json(['message' => 'Credenciales incorrectas'], 401);
     }
 
@@ -25,4 +35,4 @@ Route::post('/login', function (Request $request) {
 });
 
 Route::post('/c_category', [CategoryController::class, 'createCategory']);
-ROute::get('/categories', [CategoryController::class, 'getCategory']); 
+Route::get('/categories', [CategoryController::class, 'getCategory']);
