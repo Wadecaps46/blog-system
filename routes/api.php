@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Api\categoryController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\PostController;
 use App\Models\User;
 use App\Models\Post;
 
@@ -12,9 +13,27 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-
+// Register
 Route::post('/register', [AuthController::class, 'register']);
 
+// Login
+Route::post('/login', function (Request $request) {
+    $user = User::where('email', $request->input('email'))->first();
+
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        return response()->json(['message' => 'Credenciales incorrectas'], 401);
+    }
+
+    return response()->json([
+        'user' => [
+            'name' => $user->name,
+            'email' => $user->email,
+        ],
+        'token' => $user->createToken('api')->plainTextToken,
+    ]);
+});
+
+// Creacion de posts despues del login y obteción de token
 Route::middleware(['auth:sanctum', 'ability:create-post'])->post('/posts', function (Request $request) {
     // Validar los datos del post
     $validated = $request->validate([
@@ -37,6 +56,9 @@ Route::middleware(['auth:sanctum', 'ability:create-post'])->post('/posts', funct
     ], 201);
 });
 
+// Obtener todos los posts por categoría
+Route::get('/posts/{categoryId}', [PostController::class, 'getPostsByCategory']);
+
 
 
 // Creacion de rutas con permisos de post para test
@@ -48,21 +70,6 @@ Route::middleware(['auth:sanctum', 'ability:create-post'])->get('/post/create', 
     ];
 });
 
-Route::post('/login', function (Request $request) {
-    $user = User::where('email', $request->input('email'))->first();
-
-    if (!$user || !Hash::check($request->password, $user->password)) {
-        return response()->json(['message' => 'Credenciales incorrectas'], 401);
-    }
-
-    return response()->json([
-        'user' => [
-            'name' => $user->name,
-            'email' => $user->email,
-        ],
-        'token' => $user->createToken('api')->plainTextToken,
-    ]);
-});
 
 Route::post('/c_category', [CategoryController::class, 'createCategory']);
 Route::get('/categories', [CategoryController::class, 'getCategory']);
