@@ -1,38 +1,5 @@
 <?php
 
-// namespace App\Http\Controllers\Api;
-
-// use App\Http\Controllers\Controller;
-// use Illuminate\Http\Request;
-// use Illuminate\Support\Facades\Hash;
-// use App\Models\User;
-
-// class AuthController extends Controller
-// {
-//     public function register(Request $request)
-//     {
-//         $request->validate([
-//             'name' => 'required|string|max:255',
-//             'email' => 'required|string|email|max:255|unique:users',
-//             'password' => 'required|string|min:8|confirmed',
-//         ]);
-
-//         $user = User::create([
-//             'name' => $request->name,
-//             'email' => $request->email,
-//             'password' => Hash::make($request->password),
-//         ]);
-
-//         return response()->json([
-//             'user' => [
-//                 'name' => $user->name,
-//                 'email' => $user->email,
-//             ],
-//             'token' => $user->createToken('api')->plainTextToken,
-//         ], 201); // Código de estado 201 (Created)
-//     }
-// }
-
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
@@ -62,5 +29,22 @@ class AuthController extends Controller
         ]);
 
         return response()->json(['message' => 'Usuario registrado exitosamente'], 201);
+    }
+
+    public function login(Request $request)
+    {
+        $user = User::where('email', $request->input('email'))->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Credenciales incorrectas'], 401);
+        }
+
+        return response()->json([
+            'user' => [
+                'name' => $user->name,
+                'email' => $user->email,
+            ],
+            'token' => $user->createToken('api')->plainTextToken,
+        ]);
     }
 }

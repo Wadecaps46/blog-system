@@ -17,21 +17,22 @@ Route::get('/user', function (Request $request) {
 Route::post('/register', [AuthController::class, 'register']);
 
 // Login
-Route::post('/login', function (Request $request) {
-    $user = User::where('email', $request->input('email'))->first();
+// Route::post('/login', function (Request $request) {
+//     $user = User::where('email', $request->input('email'))->first();
 
-    if (!$user || !Hash::check($request->password, $user->password)) {
-        return response()->json(['message' => 'Credenciales incorrectas'], 401);
-    }
+//     if (!$user || !Hash::check($request->password, $user->password)) {
+//         return response()->json(['message' => 'Credenciales incorrectas'], 401);
+//     }
 
-    return response()->json([
-        'user' => [
-            'name' => $user->name,
-            'email' => $user->email,
-        ],
-        'token' => $user->createToken('api')->plainTextToken,
-    ]);
-});
+//     return response()->json([
+//         'user' => [
+//             'name' => $user->name,
+//             'email' => $user->email,
+//         ],
+//         'token' => $user->createToken('api')->plainTextToken,
+//     ]);
+// });
+Route::post('/login', [AuthController::class, 'login']);
 
 // Creacion de posts despues del login y obteción de token
 Route::middleware(['auth:sanctum', 'ability:create-post'])->post('/posts', function (Request $request) {
