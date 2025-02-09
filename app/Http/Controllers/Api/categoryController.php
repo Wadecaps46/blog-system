@@ -22,28 +22,7 @@ class CategoryController extends Controller
 
     public function createCategory(Request $request)
     {
-        {
-//             // Validar los datos de la solicitud
-//             $request->validate([
-//                 'name' => 'required|string|max:255',
-//                 'description' => 'nullable|string', // La descripción es opcional
-//             ]);
-    
-//             // Crear una nueva instancia del modelo Category
-//             $category = new Category();
-    
-//             // Asignar los valores de la solicitud a los atributos del modelo
-//             $category->name = $request->input('name');
-//             $category->description = $request->input('description');
-    
-//             // Guardar el nuevo registro en la base de datos
-//             $category->save();
-    
-//             // Devolver una respuesta con el código de estado 201 (Created)
-//             return response()->json(['message' => 'Categoría creada exitosamente'], 201);
-//         }
-//     }    
-//  }   
+        {  
             $validator = Validator::make($request->all(), [
                 'name' => 'required',
                 'description' => 'required',
