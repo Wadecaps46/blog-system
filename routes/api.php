@@ -14,52 +14,18 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // Register
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:10,1');
 
 // Login
-// Route::post('/login', function (Request $request) {
-//     $user = User::where('email', $request->input('email'))->first();
-
-//     if (!$user || !Hash::check($request->password, $user->password)) {
-//         return response()->json(['message' => 'Credenciales incorrectas'], 401);
-//     }
-
-//     return response()->json([
-//         'user' => [
-//             'name' => $user->name,
-//             'email' => $user->email,
-//         ],
-//         'token' => $user->createToken('api')->plainTextToken,
-//     ]);
-// });
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 
 // Creacion de posts despues del login y obteción de token
-Route::middleware(['auth:sanctum', 'ability:create-post'])->post('/posts', function (Request $request) {
-    // Validar los datos del post
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'content' => 'required|string',
-        'category_id' => 'required|exists:categories,id',
-    ]);
 
-    // Crear el post y asociarlo al usuario autenticado
-    $post = Post::create([
-        'title' => $validated['title'],
-        'content' => $validated['content'],
-        'category_id' => $validated['category_id'],
-        'user_id' => $request->user()->id, // Asigna el post al usuario autenticado
-    ]);
+Route::middleware(['auth:sanctum', 'ability:create-post'])->post('/posts', [PostController::class, 'createPost']);
 
-    return response()->json([
-        'message' => 'Post creado exitosamente',
-        'post' => $post
-    ], 201);
-});
 
 // Obtener todos los posts por categoría
 Route::get('/posts/{categoryId}', [PostController::class, 'getPostsByCategory']);
-
 
 
 // Creacion de rutas con permisos de post para test
