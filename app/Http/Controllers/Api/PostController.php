@@ -42,9 +42,11 @@ class PostController extends Controller
         ]);
 
         if ($validator->fails()) {
+            $categories = Category::all(['id', 'name']); // Obtiene todas las categorías para mostrarlas en el formulario
             return response()->json([
                 'message' => 'Error en la validación',
                 'errors' => $validator->errors(),
+                'categories' => $categories, // Incluye las categorías en la respuesta
                 'status' => 400
             ], 400);
         }
