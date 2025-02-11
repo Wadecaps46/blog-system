@@ -20,9 +20,13 @@ Route::post('/register', [AuthController::class, 'register'])->middleware('throt
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 
 // Creacion de posts despues del login y obteción de token
-
 Route::middleware(['auth:sanctum', 'ability:create-post'])->post('/posts', [PostController::class, 'createPost']);
 
+// Actualizar post 
+Route::middleware(['auth:sanctum', 'ability:update-post'])->put('/posts/{id}', [PostController::class, 'updatePost']);
+
+// Eliminar post
+Route::middleware(['auth:sanctum', 'ability:delete-post'])->delete('/posts/{id}', [PostController::class, 'deletePost']);
 
 // Obtener todos los posts por categoría
 Route::get('/posts/{categoryId}', [PostController::class, 'getPostsByCategory']);
