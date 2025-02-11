@@ -35,7 +35,7 @@ class AuthController extends Controller
         // Dispara el evento Registered después de crear el usuario
         event(new Registered($user));
 
-        return response()->json(['message' => 'Usuario registrado exitosamente. Por favor, verifica tu email.'], 201);
+        return response()->json(['message' => 'Usuario registrado exitosamente. Por favor, ejecutar evento.'], 201);
     }
 
     public function login(Request $request)
